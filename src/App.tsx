@@ -10,6 +10,8 @@ import SimulationControls from './components/SimulationControls';
 import AgentDrawer from './components/AgentDrawer';
 import ClientList from './components/ClientList';
 import ClientDrawer from './components/ClientDrawer';
+import CalendarView from './components/CalendarView';
+import MetricsView from './components/MetricsView';
 
 import { Agent, QueueCall, Recording, Evaluation, VisaClient, VisaStatus } from './types';
 import { 
@@ -30,6 +32,8 @@ export default function App() {
 
   // Layout navigation tabs (GoTravel Tickets manager by default)
   const [activeTab, setActiveTab] = useState<'tickets' | 'monitoring' | 'queues' | 'recordings' | 'quality'>('tickets');
+  const [activeView, setActiveView] = useState<'dashboard' | 'clients' | 'calendar'>('dashboard');
+  const [activeSidebarSection, setActiveSidebarSection] = useState<string>('dashboard');
 
   // Interactive header widgets
   const [webphoneConnected, setWebphoneConnected] = useState(true);
@@ -109,8 +113,16 @@ export default function App() {
     <div className="min-h-screen bg-[#f4f7fb] text-slate-800 flex antialiased">
       {/* 1. Global navigation left sidebar */}
       <Sidebar 
-        activeSection="monitoring" 
-        setActiveSection={() => {}} 
+        activeSection={activeSidebarSection}
+        setActiveSection={setActiveSidebarSection}
+        onSelectClients={() => {
+          setActiveSidebarSection('dashboard');
+          setActiveView('clients');
+        }}
+        onSelectCalendar={() => {
+          setActiveSidebarSection('calendar');
+          setActiveView('calendar');
+        }}
       />
 
       {/* 2. Top Header AppBar */}
@@ -141,14 +153,26 @@ export default function App() {
 
         {/* Tab content router */}
         <div className="relative animate-fade-in duration-300">
-          <ClientList
-            clients={clients}
-            selectedClient={selectedClient}
-            onClientClick={(client) => {
-              setSelectedAgent(null);
-              setSelectedClient(client);
-            }}
-          />
+          {activeView === 'dashboard' ? (
+            <MetricsView clients={clients} />
+          ) : activeView === 'clients' ? (
+            <ClientList
+              clients={clients}
+              selectedClient={selectedClient}
+              onClientClick={(client) => {
+                setSelectedAgent(null);
+                setSelectedClient(client);
+              }}
+            />
+          ) : (
+            <CalendarView
+              clients={clients}
+              onSelectClient={(client) => {
+                setSelectedAgent(null);
+                setSelectedClient(client);
+              }}
+            />
+          )}
         </div>
 
       </main>

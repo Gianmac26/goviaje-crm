@@ -16,9 +16,11 @@ import {
 interface SidebarProps {
   activeSection: string;
   setActiveSection: (section: string) => void;
+  onSelectClients?: () => void;
+  onSelectCalendar?: () => void;
 }
 
-export default function Sidebar({ activeSection, setActiveSection }: SidebarProps) {
+export default function Sidebar({ activeSection, setActiveSection, onSelectClients, onSelectCalendar }: SidebarProps) {
   const menuItems = [
     { id: 'dashboard', icon: LineChart, label: 'Métricas' },
     { id: 'monitoring', icon: Eye, label: 'Monitoreo' },
@@ -37,7 +39,10 @@ export default function Sidebar({ activeSection, setActiveSection }: SidebarProp
       {/* Brand logo */}
       <div className="flex flex-col items-center gap-6 mb-8 mt-2">
         <button 
-          onClick={() => setActiveSection('tickets')}
+          onClick={() => {
+            setActiveSection('dashboard');
+            onSelectClients?.();
+          }}
           className="w-10 h-10 flex items-center justify-center bg-amber-500 rounded-xl text-white shadow-sm hover:scale-105 transition-transform cursor-pointer"
           title="GoTravel Home"
         >
@@ -56,7 +61,21 @@ export default function Sidebar({ activeSection, setActiveSection }: SidebarProp
           return (
             <button
               key={item.id}
-              onClick={() => setActiveSection('tickets')}
+              onClick={() => {
+                if (item.id === 'dashboard') {
+                  setActiveSection('dashboard');
+                  onSelectClients?.();
+                  return;
+                }
+
+                if (item.id === 'calendar') {
+                  setActiveSection('calendar');
+                  onSelectCalendar?.();
+                  return;
+                }
+
+                setActiveSection(item.id);
+              }}
               className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-200 relative group cursor-pointer ${
                 isActive 
                   ? 'bg-amber-400 text-slate-900 shadow-sm' 
